@@ -1,7 +1,7 @@
-import firebase from "firebase";
+import * as firebase from "firebase/app";
 import "@firebase/firestore";
 
-const config = {
+export const firebaseConfig = {
   apiKey: "AIzaSyCDAJ7I-6e-Z2Pfe5i1XPeMh6zrMZxa3C0",
   authDomain: "comoon-app.firebaseapp.com",
   databaseURL: "https://comoon-app.firebaseio.com",
@@ -12,10 +12,12 @@ const config = {
   measurementId: "G-SB27PTDKVS",
 };
 
-firebase.initializeApp(config);
+firebase.initializeApp(firebaseConfig);
 
 const db = firebase.firestore();
 const eventsRef = db.collection("events");
+
+export { firebase, db as default };
 
 export const getEvent = async (id) => {
   const doc = await eventsRef.doc(id).get();

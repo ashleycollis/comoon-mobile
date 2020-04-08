@@ -9,6 +9,7 @@ import store from "./store";
 import BottomTabNavigator from "./navigation/BottomTabNavigator";
 import useLinking from "./navigation/useLinking";
 import { Provider } from "react-redux";
+import LandingScreen from "./screens/LandingScreen";
 
 // atob error fix
 import { decode, encode } from "base-64";
@@ -61,6 +62,7 @@ export default function App(props) {
             initialState={initialNavigationState}
           >
             <Stack.Navigator>
+              <Stack.Screen name="Landing" component={LandingScreen} />
               <Stack.Screen name="Root" component={BottomTabNavigator} />
             </Stack.Navigator>
           </NavigationContainer>

@@ -22,7 +22,7 @@ export default function BottomTabNavigator({ navigation, route }) {
         options={{
           tabBarIcon: ({ focused }) => (
             <TabBarIcon focused={focused} name="home" />
-          )
+          ),
         }}
       />
       <BottomTab.Screen
@@ -31,7 +31,7 @@ export default function BottomTabNavigator({ navigation, route }) {
         options={{
           tabBarIcon: ({ focused }) => (
             <TabBarIcon focused={focused} name="magnify" />
-          )
+          ),
         }}
       />
       <BottomTab.Screen
@@ -40,7 +40,7 @@ export default function BottomTabNavigator({ navigation, route }) {
         options={{
           tabBarIcon: ({ focused }) => (
             <TabBarIcon focused={focused} name="account" />
-          )
+          ),
         }}
       />
     </BottomTab.Navigator>
