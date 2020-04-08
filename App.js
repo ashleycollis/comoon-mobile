@@ -10,6 +10,11 @@ import BottomTabNavigator from "./navigation/BottomTabNavigator";
 import useLinking from "./navigation/useLinking";
 import { Provider } from "react-redux";
 
+// atob error fix
+import { decode, encode } from "base-64";
+if (!global.btoa) global.btoa = encode;
+if (!global.atob) global.atob = decode;
+
 const Stack = createStackNavigator();
 
 export default function App(props) {
@@ -30,7 +35,7 @@ export default function App(props) {
         // Load fonts
         await Font.loadAsync({
           ...MaterialCommunityIcons.font,
-          "space-mono": require("./assets/fonts/SpaceMono-Regular.ttf")
+          "space-mono": require("./assets/fonts/SpaceMono-Regular.ttf"),
         });
       } catch (e) {
         // We might want to provide this error information to an error reporting service
@@ -68,6 +73,6 @@ export default function App(props) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#fff"
-  }
+    backgroundColor: "#fff",
+  },
 });

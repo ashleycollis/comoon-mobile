@@ -1,54 +1,36 @@
 import { createSlice } from "@reduxjs/toolkit";
+import { getEvent } from "../../api/firebaseAPI";
 
 const initialState = {
-  attending: [],
-  organizing: []
+  myEvents: {},
+  events: {},
 };
 
 const eventsSlice = createSlice({
   name: "events",
   initialState,
   reducers: {
-    setAttending: (_state, { payload }) => {
-      state.attending = payload;
-    }
-    //   setRoutes: (state, { payload }) => {
-    //     state.list = payload;
-    //     state.currentIndex = 0;
-    //   },
-    //   setCurrentIndex: (state, { payload }) => {
-    //     state.currentIndex = payload;
-    //   },
-    //   clearRoutes: () => initialState,
-    //   toggleWaiting: state => {
-    //     state.waiting = !state.waiting;
-    //   }
-  }
+    setMyEvents: (_state, { payload }) => {
+      state.myEvents = payload;
+    },
+    addEvent: (state, { payload }) => {
+      state.events[payload.id] = payload;
+    },
+    addMyEvent: (state, { payload }) => {
+      state.myEvents[payload.id] = payload;
+    },
+  },
 });
 
-export const { setAttending } = eventsSlice.actions;
+export const { addEvent, addMyEvent } = eventsSlice.actions;
 export default eventsSlice.reducer;
 
-// export const fetchRoutes = () => async (dispatch, getState) => {
-//   dispatch(clearRoutes());
-//   const { location, destination, interests } = getState();
-//   try {
-//     dispatch(toggleWaiting());
-//     const routesInfo = await getRoutesInfo(location, destination, interests);
-//     const routes = await Promise.all(
-//       routesInfo.map(async ({ routeName, route, spots }) => {
-//         const directions = await getDirections(route);
-//         return {
-//           routeName,
-//           spots,
-//           ...directions
-//         };
-//       })
-//     );
-
-//     dispatch(toggleWaiting());
-//     dispatch(setRoutes(routes));
-//   } catch (err) {
-//     console.error(err.toString());
-//   }
-// };
+export const fetchEvent = (id) => async (dispatch) => {
+  try {
+    const event = await getEvent(id);
+    if (event.participants.includes("Tobias")) dispatch(addMyEvent(event));
+    else dispatch(addEvent(event));
+  } catch (err) {
+    console.log(err);
+  }
+};
