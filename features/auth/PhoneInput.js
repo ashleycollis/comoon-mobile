@@ -1,6 +1,7 @@
-import React, { useState } from "react";
-import { View, Text, TextInput, StyleSheet } from "react-native";
+import React, { useState, useEffect } from "react";
+import { View, TextInput, StyleSheet } from "react-native";
 import CountryPicker from "react-native-country-picker-modal";
+import { getCallingCode } from "react-native-country-picker-modal";
 
 import * as Cellular from "expo-cellular";
 
@@ -8,7 +9,18 @@ export default function PhoneInput({ setPhoneNumber }) {
   const [number, setNumber] = useState("");
   const [country, setCountry] = useState({
     cca2: Cellular.isoCountryCode.toUpperCase(),
+    callingCode: 351,
   });
+
+  useEffect(() => {
+    async function guessCallingCode() {
+      const code = await getCallingCode(country.cca2);
+      setCountry((country) =>
+        !country["name"] ? { ...country, callingCode: code } : country
+      );
+    }
+    guessCallingCode();
+  }, []);
 
   return (
     <View style={styles.container}>

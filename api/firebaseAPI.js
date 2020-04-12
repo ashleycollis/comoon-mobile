@@ -1,5 +1,8 @@
 import * as firebase from "firebase/app";
 import "@firebase/firestore";
+import "firebase/auth";
+import { login } from "../features/auth/authSlice";
+import store from "../store";
 
 export const firebaseConfig = {
   apiKey: "AIzaSyCDAJ7I-6e-Z2Pfe5i1XPeMh6zrMZxa3C0",
@@ -17,7 +20,22 @@ firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 const eventsRef = db.collection("events");
 
-export { firebase, db as default };
+const authentication = firebase.auth();
+
+authentication.onAuthStateChanged((user) => {
+  store.dispatch(login(!!user));
+});
+
+const checkLoggedIn = async () =>
+  new Promise((resolve, reject) => {
+    try {
+      authentication.onAuthStateChanged(() => resolve());
+    } catch (err) {
+      reject();
+    }
+  });
+
+export { firebase, db as default, authentication, checkLoggedIn };
 
 export const getEvent = async (id) => {
   const doc = await eventsRef.doc(id).get();

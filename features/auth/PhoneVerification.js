@@ -12,10 +12,8 @@ export default function PhoneVerification({ verificationId, navigation }) {
       verificationId,
       verificationCode
     );
-    const authResult = await firebase.auth().signInWithCredential(credential);
-    console.log(authResult);
+    await firebase.auth().signInWithCredential(credential);
     Keyboard.dismiss();
-    navigation.navigate("Root");
   };
 
   return (

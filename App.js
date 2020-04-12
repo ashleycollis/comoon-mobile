@@ -3,23 +3,19 @@ import { Platform, StatusBar, StyleSheet, View } from "react-native";
 import { SplashScreen } from "expo";
 import * as Font from "expo-font";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
-import { NavigationContainer } from "@react-navigation/native";
-import { createStackNavigator } from "@react-navigation/stack";
 import store from "./store";
-import BottomTabNavigator from "./navigation/BottomTabNavigator";
 import useLinking from "./navigation/useLinking";
 import { Provider } from "react-redux";
-import LandingScreen from "./screens/LandingScreen";
-import VerificationScreen from "./screens/VerificationScreen";
+import Navigation from "./navigation/Navigation";
+import { checkLoggedIn } from "./api/firebaseAPI";
 
 // atob error fix
 import { decode, encode } from "base-64";
+
 if (!global.btoa) global.btoa = encode;
 if (!global.atob) global.atob = decode;
 
-const Stack = createStackNavigator();
-
-export default function App(props) {
+export default function App({ skipLoadingScreen }) {
   const [isLoadingComplete, setLoadingComplete] = React.useState(false);
   const [initialNavigationState, setInitialNavigationState] = React.useState();
   const containerRef = React.useRef();
@@ -39,6 +35,8 @@ export default function App(props) {
           ...MaterialCommunityIcons.font,
           "space-mono": require("./assets/fonts/SpaceMono-Regular.ttf"),
         });
+
+        await checkLoggedIn();
       } catch (e) {
         // We might want to provide this error information to an error reporting service
         console.warn(e);
@@ -51,26 +49,17 @@ export default function App(props) {
     loadResourcesAndDataAsync();
   }, []);
 
-  if (!isLoadingComplete && !props.skipLoadingScreen) {
+  if (!isLoadingComplete && !skipLoadingScreen) {
     return null;
   } else {
     return (
       <Provider store={store}>
         <View style={styles.container}>
           {Platform.OS === "ios" && <StatusBar barStyle="default" />}
-          <NavigationContainer
-            ref={containerRef}
-            initialState={initialNavigationState}
-          >
-            <Stack.Navigator>
-              <Stack.Screen name="Landing" component={LandingScreen} />
-              <Stack.Screen name="Root" component={BottomTabNavigator} />
-              <Stack.Screen
-                name="VerificationScreen"
-                component={VerificationScreen}
-              />
-            </Stack.Navigator>
-          </NavigationContainer>
+          <Navigation
+            containerRef={containerRef}
+            initialNavigationState={initialNavigationState}
+          />
         </View>
       </Provider>
     );
