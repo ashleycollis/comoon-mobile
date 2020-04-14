@@ -3,6 +3,7 @@ import { NavigationContainer } from "@react-navigation/native";
 import BottomTabNavigator from "./BottomTabNavigator";
 import LandingScreen from "../screens/LandingScreen";
 import VerificationScreen from "../screens/VerificationScreen";
+import SignUpScreen from "../screens/SignUpScreen";
 import { connect } from "react-redux";
 import { createStackNavigator } from "@react-navigation/stack";
 
@@ -24,10 +25,8 @@ function Navigation({ containerRef, initialNavigationState, loggedIn }) {
         ) : (
           <>
             <Stack.Screen name="Landing" component={LandingScreen} />
-            <Stack.Screen
-              name="VerificationScreen"
-              component={VerificationScreen}
-            />
+            <Stack.Screen name="Verification" component={VerificationScreen} />
+            <Stack.Screen name="SignUp" component={SignUpScreen} />
           </>
         )}
       </Stack.Navigator>

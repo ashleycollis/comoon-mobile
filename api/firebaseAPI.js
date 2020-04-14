@@ -23,7 +23,8 @@ const eventsRef = db.collection("events");
 const authentication = firebase.auth();
 
 authentication.onAuthStateChanged((user) => {
-  store.dispatch(login(!!user));
+  console.log(user);
+  store.dispatch(login(!!user && !!user.displayName));
 });
 
 const checkLoggedIn = async () =>
@@ -35,11 +36,26 @@ const checkLoggedIn = async () =>
     }
   });
 
-export { firebase, db as default, authentication, checkLoggedIn };
+const signInWithVerification = async (verificationId, verificationCode) => {
+  const credential = firebase.auth.PhoneAuthProvider.credential(
+    verificationId,
+    verificationCode
+  );
+  return await firebase.auth().signInWithCredential(credential);
+};
 
-export const getEvent = async (id) => {
+const getEvent = async (id) => {
   const doc = await eventsRef.doc(id).get();
   return { ...doc.data(), id };
+};
+
+export {
+  firebase,
+  db as default,
+  authentication,
+  checkLoggedIn,
+  signInWithVerification,
+  getEvent,
 };
 
 // const collectionName = "snack-SJucFknGX";

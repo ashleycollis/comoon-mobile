@@ -1,19 +1,21 @@
 import React, { useState } from "react";
 import { View, TextInput, Button, StyleSheet, Keyboard } from "react-native";
-import { firebase } from "../../api/firebaseAPI";
-import "firebase/auth";
+import { signInWithVerification } from "../../api/firebaseAPI";
 
 export default function PhoneVerification({ verificationId, navigation }) {
   const [verificationCode, setVerificationCode] = useState("");
   // Whenever the user has entered the verification-code, continue and
   // create the credential and sign in.
   onPressConfirmVerificationCode = async () => {
-    const credential = firebase.auth.PhoneAuthProvider.credential(
+    const { user } = await signInWithVerification(
       verificationId,
       verificationCode
     );
-    await firebase.auth().signInWithCredential(credential);
-    Keyboard.dismiss();
+    if (user && !user.displayName) {
+      navigation.navigate("SignUp");
+    } else {
+      Keyboard.dismiss();
+    }
   };
 
   return (

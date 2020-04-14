@@ -1,6 +1,6 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { View, Button } from "react-native";
-import { firebase, firebaseConfig } from "../../api/firebaseAPI";
+import { firebase, firebaseConfig, user } from "../../api/firebaseAPI";
 import "firebase/auth";
 import { FirebaseRecaptchaVerifierModal } from "expo-firebase-recaptcha";
 import PhoneInput from "./PhoneInput";
@@ -8,6 +8,12 @@ import PhoneInput from "./PhoneInput";
 export default function PhoneAuth({ navigation }) {
   const [phoneNumber, setPhoneNumber] = useState("");
   const recaptchaVerifier = useRef(null);
+
+  useEffect(() => {
+    if (user) {
+      navigation.navigate("SignUp");
+    }
+  });
 
   // Call verifyPhoneNumber with the `recaptchaVerifier` ref.
   // This will automatically make the modal visible and display
@@ -18,7 +24,7 @@ export default function PhoneAuth({ navigation }) {
       phoneNumber,
       recaptchaVerifier.current
     );
-    navigation.navigate("VerificationScreen", { verificationId });
+    navigation.navigate("Verification", { verificationId });
   };
 
   return (
