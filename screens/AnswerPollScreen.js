@@ -17,7 +17,10 @@ export default class App extends React.Component {
     this.state = {
       top: 0,
       startY: null,
+      availabilityList: [],
+      adding: false,
     };
+    this.isOccupied = this.isOccupied.bind(this);
   }
 
   scrollOffset = 0;
@@ -27,63 +30,86 @@ export default class App extends React.Component {
 
   panResponder = PanResponder.create({
     // Ask to be the responder:
-    onStartShouldSetPanResponder: (evt, gestureState) => true,
-    onStartShouldSetPanResponderCapture: (evt, gestureState) => true,
-    onMoveShouldSetPanResponder: (evt, gestureState) => true,
-    onMoveShouldSetPanResponderCapture: (evt, gestureState) => true,
+    onStartShouldSetPanResponder: () => true,
+    onStartShouldSetPanResponderCapture: () => true,
+    onMoveShouldSetPanResponder: () => true,
+    onMoveShouldSetPanResponderCapture: () => true,
 
-    onPanResponderGrant: async ({ nativeEvent }, gestureState) => {
+    onPanResponderGrant: async (_evt, gestureState) => {
+      let headerHeight = this.state.startY;
+
       // The gesture has started
-
-      if (!this.state.startY) {
+      if (!headerHeight) {
         const ref = this.viewRef;
-        const startY = await new Promise((resolve) => {
+
+        // Moving this to componentDidMount didn't work
+        headerHeight = await new Promise((resolve) => {
           ref.measure((_x, _y, _width, _height, _pageX, pageY) => {
             resolve(pageY);
           });
         });
-
-        const top = gestureState.y0 + this.scrollOffset - startY;
-        const topWithSnapping = top - (top % TIMEBOX_HEIGHT);
-        this.setState({ top: topWithSnapping + CALENDAR_MARGIN_TOP, startY });
-        this.gestureOffset = top % TIMEBOX_HEIGHT;
-      } else {
-        const top = gestureState.y0 + this.scrollOffset - this.state.startY;
-        const topWithSnapping = top - (top % TIMEBOX_HEIGHT);
-        this.setState({ top: topWithSnapping + CALENDAR_MARGIN_TOP });
-        this.gestureOffset = top % TIMEBOX_HEIGHT;
       }
-      this.height.setValue(TIMEBOX_HEIGHT);
-      this.blocks = 1;
+      const top = gestureState.y0 + this.scrollOffset - headerHeight;
+      if (!this.isOccupied(top)) {
+        const topWithSnapping = top - (top % TIMEBOX_HEIGHT);
+        const stateChange = {
+          top: topWithSnapping + CALENDAR_MARGIN_TOP,
+          adding: true,
+        };
+        this.setState(
+          !this.state.startY
+            ? { ...stateChange, startY: headerHeight }
+            : stateChange
+        );
+        this.gestureOffset = top % TIMEBOX_HEIGHT;
+        this.height.setValue(TIMEBOX_HEIGHT);
+        this.blocks = 1;
+      }
     },
-    // onPanResponderMove: Animated.event([null, { dy: this.height }]),
 
-    onPanResponderMove: (evt, gestureState) => {
-      const height = gestureState.dy + this.gestureOffset;
-      if (
-        height < (this.blocks - 1) * TIMEBOX_HEIGHT ||
-        height > this.blocks * TIMEBOX_HEIGHT
-      ) {
-        const heightWithSnapping =
-          TIMEBOX_HEIGHT + height - (height % TIMEBOX_HEIGHT);
-        this.blocks = heightWithSnapping / TIMEBOX_HEIGHT;
-        Animated.timing(this.height, {
-          toValue: heightWithSnapping,
-          duration: 10,
-        }).start();
+    onPanResponderMove: (_evt, gestureState) => {
+      if (this.state.adding) {
+        const height = gestureState.dy + this.gestureOffset;
+        if (
+          (height < (this.blocks - 1) * TIMEBOX_HEIGHT ||
+            height > this.blocks * TIMEBOX_HEIGHT) &&
+          !this.isOccupied(this.state.top + height)
+        ) {
+          const heightWithSnapping =
+            TIMEBOX_HEIGHT + height - (height % TIMEBOX_HEIGHT);
+          this.blocks = heightWithSnapping / TIMEBOX_HEIGHT;
+          Animated.timing(this.height, {
+            toValue: heightWithSnapping,
+            duration: 10,
+          }).start();
+        }
       }
     },
 
     onPanResponderTerminationRequest: (evt, gestureState) => true,
     onPanResponderRelease: (evt, gestureState) => {
-      console.log("Released");
       // The user has released all touches while this view is the
       // responder. This typically means a gesture has succeeded
+      if (this.state.adding) {
+        this.setState((state) => {
+          return this.height._value > 0
+            ? {
+                availabilityList: [
+                  ...state.availabilityList,
+                  { startY: this.state.top, height: this.height._value },
+                ],
+                adding: false,
+              }
+            : {
+                adding: false,
+              };
+        });
+      }
     },
     onPanResponderTerminate: (evt, gestureState) => {
-      console.log("Terminated");
       // Another component has become the responder, so this gesture
       // should be cancelled
+      this.setState({ adding: false });
     },
     onShouldBlockNativeResponder: (evt, gestureState) => {
       // Returns whether this component should block native components from becoming the JS
@@ -92,7 +118,16 @@ export default class App extends React.Component {
     },
   });
 
+  isOccupied(y) {
+    const test = this.state.availabilityList.reduce((acc, item) => {
+      const { startY, height } = item;
+      return acc || (startY <= y && y <= startY + height);
+    }, false);
+    return test;
+  }
+
   render() {
+    const { availabilityList, adding, top } = this.state;
     return (
       <View
         ref={(ref) => (this.viewRef = ref)}
@@ -123,14 +158,23 @@ export default class App extends React.Component {
             <Row time={"21:00"} />
             <Row time={"21:00"} />
           </View>
-          <View style={styles.overlay}>
-            <Animated.View
-              style={[
-                styles.selectionBox,
-                { height: this.height, marginTop: this.state.top },
-              ]}
-            />
-          </View>
+          {adding && (
+            <View style={styles.overlay}>
+              <Animated.View
+                style={[
+                  styles.selectionBox,
+                  { height: this.height, marginTop: top },
+                ]}
+              />
+            </View>
+          )}
+          {availabilityList.map(({ startY, height }) => (
+            <View style={styles.overlay} key={startY}>
+              <Animated.View
+                style={[styles.selectionBox, { height, marginTop: startY }]}
+              />
+            </View>
+          ))}
         </ScrollView>
       </View>
     );
