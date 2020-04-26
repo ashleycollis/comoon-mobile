@@ -4,6 +4,7 @@ import BottomTabNavigator from "./BottomTabNavigator";
 import LandingScreen from "../screens/LandingScreen";
 import VerificationScreen from "../screens/VerificationScreen";
 import SignUpScreen from "../screens/SignUpScreen";
+import AnswerPollScreen from "../screens/AnswerPollScreen";
 import { connect } from "react-redux";
 import { createStackNavigator } from "@react-navigation/stack";
 
@@ -21,7 +22,10 @@ function Navigation({ containerRef, initialNavigationState, loggedIn }) {
     >
       <Stack.Navigator>
         {loggedIn ? (
-          <Stack.Screen name="Root" component={BottomTabNavigator} />
+          <>
+            <Stack.Screen name="Answer" component={AnswerPollScreen} />
+            <Stack.Screen name="Root" component={BottomTabNavigator} />
+          </>
         ) : (
           <>
             <Stack.Screen name="Landing" component={LandingScreen} />
