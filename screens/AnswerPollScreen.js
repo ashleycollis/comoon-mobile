@@ -17,11 +17,13 @@ export default class App extends React.Component {
     this.state = {
       top: 0,
       startY: null,
-      height: new Animated.Value(0),
     };
   }
 
   scrollOffset = 0;
+  gestureOffset = 0;
+  blocks = 1;
+  height = new Animated.Value(0);
 
   panResponder = PanResponder.create({
     // Ask to be the responder:
@@ -44,23 +46,42 @@ export default class App extends React.Component {
         const top = gestureState.y0 + this.scrollOffset - startY;
         const topWithSnapping = top - (top % TIMEBOX_HEIGHT);
         this.setState({ top: topWithSnapping + CALENDAR_MARGIN_TOP, startY });
+        this.gestureOffset = top % TIMEBOX_HEIGHT;
       } else {
         const top = gestureState.y0 + this.scrollOffset - this.state.startY;
         const topWithSnapping = top - (top % TIMEBOX_HEIGHT);
         this.setState({ top: topWithSnapping + CALENDAR_MARGIN_TOP });
+        this.gestureOffset = top % TIMEBOX_HEIGHT;
+      }
+      this.height.setValue(TIMEBOX_HEIGHT);
+      this.blocks = 1;
+    },
+    // onPanResponderMove: Animated.event([null, { dy: this.height }]),
+
+    onPanResponderMove: (evt, gestureState) => {
+      const height = gestureState.dy + this.gestureOffset;
+      if (
+        height < (this.blocks - 1) * TIMEBOX_HEIGHT ||
+        height > this.blocks * TIMEBOX_HEIGHT
+      ) {
+        const heightWithSnapping =
+          TIMEBOX_HEIGHT + height - (height % TIMEBOX_HEIGHT);
+        this.blocks = heightWithSnapping / TIMEBOX_HEIGHT;
+        Animated.timing(this.height, {
+          toValue: heightWithSnapping,
+          duration: 10,
+        }).start();
       }
     },
-    onPanResponderMove: (evt, gestureState) => {
-      // The most recent move distance is gestureState.move{X,Y}
-      // The accumulated gesture distance since becoming responder is
-      // gestureState.d{x,y}
-    },
+
     onPanResponderTerminationRequest: (evt, gestureState) => true,
     onPanResponderRelease: (evt, gestureState) => {
+      console.log("Released");
       // The user has released all touches while this view is the
       // responder. This typically means a gesture has succeeded
     },
     onPanResponderTerminate: (evt, gestureState) => {
+      console.log("Terminated");
       // Another component has become the responder, so this gesture
       // should be cancelled
     },
@@ -77,13 +98,12 @@ export default class App extends React.Component {
         ref={(ref) => (this.viewRef = ref)}
         style={styles.container}
         collapsable={false}
+        {...this.panResponder.panHandlers}
       >
         <ScrollView
-          collapsable={false}
           onScroll={({ nativeEvent }) =>
             (this.scrollOffset = nativeEvent.contentOffset.y)
           }
-          {...this.panResponder.panHandlers}
         >
           <View style={styles.timeContainer}>
             <Row time={"10:00"} />
@@ -107,7 +127,7 @@ export default class App extends React.Component {
             <Animated.View
               style={[
                 styles.selectionBox,
-                { height: TIMEBOX_HEIGHT, marginTop: this.state.top },
+                { height: this.height, marginTop: this.state.top },
               ]}
             />
           </View>
