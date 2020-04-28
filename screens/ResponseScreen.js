@@ -1,47 +1,45 @@
 import * as React from 'react';
 import { StyleSheet, Text } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
+import { getResponse } from '../api/pollRoutes';
+import { render } from 'react-dom';
 
-export default function ResponseScreen() {
-  return (
-    <ScrollView
-      style={styles.container}
-      contentContainerStyle={styles.contentContainer}
-    >
-      <Text>Poll Results</Text>
-      <Text>Name</Text>
-      <Text>Group</Text>
-      <Text>Location</Text>
-      <Text>Participant Availability</Text>
-    </ScrollView>
-  );
+export default class ResponseScreen extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      response: '',
+    };
+  }
+  async componentDidMount() {
+    let test = await getResponse('ZnyhJAgy6cFm5mfMj9GZ');
+    this.setState({
+      response: test,
+    });
+    console.log('state', this.state);
+  }
+  render() {
+    return (
+      <ScrollView
+        style={styles.container}
+        contentContainerStyle={styles.contentContainer}
+      >
+        <Text>Poll Results</Text>
+        <Text>Name</Text>
+        <Text>Group</Text>
+        <Text>Location</Text>
+        <Text>Participant Availability</Text>
+      </ScrollView>
+    );
+  }
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fafafa',
+    backgroundColor: '#E5FFFA',
   },
   contentContainer: {
-    paddingTop: 15,
-  },
-  optionIconContainer: {
-    marginRight: 12,
-  },
-  option: {
-    backgroundColor: '#fdfdfd',
-    paddingHorizontal: 15,
-    paddingVertical: 15,
-    borderWidth: StyleSheet.hairlineWidth,
-    borderBottomWidth: 0,
-    borderColor: '#ededed',
-  },
-  lastOption: {
-    borderBottomWidth: StyleSheet.hairlineWidth,
-  },
-  optionText: {
-    fontSize: 15,
-    alignSelf: 'flex-start',
-    marginTop: 1,
+    paddingTop: 50,
   },
 });
