@@ -24,4 +24,5 @@ export default StyleSheet.create({
     day: {
         fontSize: 15,
     },
+    timecardContainder:{}
 });

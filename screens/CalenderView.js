@@ -1,35 +1,30 @@
-import React, {Component, useState} from 'react';
+import React, { Component } from 'react';
 import {
-    StyleSheet,
-    Text,
-    View
+  StyleSheet,
+  Text,
+  View
 } from 'react-native';
-import calendarPicker from 'react-native-calendar-picker';
+const testIDs = require('./testIDs');
+import {Calendar, CalendarList, Agenda} from 'react-native-calendars';
 
-const CalenderView = ({})=>{    
-    const [selectedStartDate, SetselectedStartDate] = useState(null)
-    onDateChange(date){
-        selectedStartDate: date
-    }
-    return(
-        <View style={styles.container}>
-        <CalendarPicker
-          onDateChange={this.onDateChange}
+export default class CalendarsList extends Component{
+    render(){
+        return(
+        <CalendarList
+        testID={testIDs.calendarList.CONTAINER}
+        pastScrollRange={24}
+        futureScrollRange={24}
         />
-        <View>
-          <Text>SELECTED DATE:{ startDate }</Text>
-        </View>
-      </View>
-
-    );
+        );
+    }
 }
-
-export default CalenderView;
-
+ 
 const styles = StyleSheet.create({
-    container: {
-      flex: 1,
-      backgroundColor: '#FFFFFF',
-      marginTop: 100,
-    },
-  });
+  container: {
+    flex: 1,
+    backgroundColor: '#FFFFFF',
+    marginTop: 100,
+  },
+});
+
+
