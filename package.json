@@ -22,6 +22,7 @@
     "base-64": "^0.1.0",
     "expo": "~36.0.0",
     "expo-asset": "~8.0.0",
+    "expo-cellular": "~2.0.0",
     "expo-constants": "~8.0.0",
     "expo-firebase-core": "^1.0.0",
     "expo-firebase-recaptcha": "^1.0.0",
@@ -31,6 +32,7 @@
     "react": "~16.9.0",
     "react-dom": "~16.9.0",
     "react-native": "https://github.com/expo/react-native/archive/sdk-36.0.0.tar.gz",
+    "react-native-calendars": "^1.265.0",
     "react-native-country-picker-modal": "^1.10.0",
     "react-native-gesture-handler": "~1.5.0",
     "react-native-safe-area-context": "0.6.0",
@@ -39,8 +41,7 @@
     "react-native-webview": "7.4.3",
     "react-redux": "^7.2.0",
     "redux": "^4.0.5",
-    "redux-thunk": "^2.3.0",
-    "expo-cellular": "~2.0.0"
+    "redux-thunk": "^2.3.0"
   },
   "devDependencies": {
     "@babel/core": "^7.0.0",
