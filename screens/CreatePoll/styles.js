@@ -39,6 +39,8 @@ export default StyleSheet.create({
         borderRadius: 6,
         color: '#fff',
         fontSize: 20,
+        marginLeft: 60,
+        padding: 4,
     },
     dateOptionsDisplay: {
         flex: 3,
@@ -50,11 +52,11 @@ export default StyleSheet.create({
         alignItems: 'center',
         marginTop: -40
     },
-    selectedHoursTitle: {
+    sectionTitle: {
         marginLeft: 18,
         alignSelf: 'flex-start',
-        fontSize: 15,
-        color: 'rgba(0,0,0,0.4)'
+        fontSize: 18,
+        color: '#fff'
     },
     location: {
         width: deviceWidth - 40,

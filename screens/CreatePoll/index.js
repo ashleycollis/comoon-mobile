@@ -19,38 +19,43 @@ const CreatePoll = ({ navigation }) => {
         <View style={styles.contentView}>
             <View style={styles.pollNameSection}>
                 <TextInput
-                  value={pollName}
-                  style={styles.polltextInput}
-                  onChangeText={(text) => setPollName(text)}
+                    value={pollName}
+                    style={styles.polltextInput}
+                    onChangeText={(text) => setPollName(text)}
                 />
             </View>
             <View style={styles.datesSection}>
+                <Text style={styles.sectionTitle}>Date:</Text>
                 <View style={styles.numDateOptions}>
-                    <Text style={styles.dateOptionsText}>
-                        {selectedDates.length}
+                    <Text style={styles.dateOptionsText}
+                        onPress={() => navigation.navigate('Calendar')}
+                    >
+                        {selectedDates.length} slots selected
                     </Text>
                 </View>
                 <View style={styles.dateOptionsDisplay}>
                     <ScrollView
-                      horizontal={true}
-                      showsHorizontalScrollIndicator={false}
+                        horizontal={true}
+                        showsHorizontalScrollIndicator={false}
                     >
                         {selectedDates && selectedDates.map((selectedDate) => (
                             <DateCard
-                              month={formatMonth(selectedDate[0].getMonth())}
-                              date={selectedDate[0].getDate()}
-                              day={formatDay(selectedDate[0].getDay())}
+                                month={formatMonth(selectedDate[0].getMonth())}
+                                date={selectedDate[0].getDate()}
+                                day={formatDay(selectedDate[0].getDay())}
                             />
                         ))}
                     </ScrollView>
                 </View>
             </View>
             <View style={styles.selectedHours}>
-                <Text style={styles.selectedHoursTitle}>Optional</Text>
+                <Text style={styles.sectionTitle}>Time:</Text>
                 <View style={styles.location}>
                     <Text
-                      style={styles.locationText}
-                      onPress={() => navigation.navigate('Explore')}
+                        style={styles.locationText}
+                        onPress={() => navigation.navigate('TimeScreen', {
+                            selectedDates
+                        })}
                     >
                         Location
                     </Text>

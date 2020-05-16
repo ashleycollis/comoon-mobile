@@ -3,6 +3,7 @@ import { StyleSheet, Dimensions } from 'react-native';
 const deviceWidth = Dimensions.get('window').width;
 
 export default StyleSheet.create({
+    /* DateCard designs */
     dateCardContainer: {
         height: deviceWidth / 4,
         width: deviceWidth / 4,
@@ -24,5 +25,31 @@ export default StyleSheet.create({
     day: {
         fontSize: 15,
     },
-    timecardContainder:{}
+    /* DateTimeCard designs */
+    cardContainer: {
+        flexDirection: 'row',
+        height: deviceWidth / 3,
+        width: deviceWidth - 25,
+        padding: 20,
+        borderWidth: 1,
+        borderRadius: 20,
+        backgroundColor: '#ffff',
+        marginVertical: 5,
+    },
+    dateTimeContainer: {
+        flex: 9,
+        flexDirection: 'column',
+        justifyContent: 'space-between',
+    },
+    dateRange: {
+        fontSize: 25,
+    },
+    timeSlots: {
+        fontSize: 16
+    },
+    addBtnContainer: {
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center'
+    },
 });
