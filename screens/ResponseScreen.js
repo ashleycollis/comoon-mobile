@@ -9,8 +9,8 @@ function ResponseScreen() {
   const [responses, setResponses] = useState('');
   const [eventName, setName] = useState('');
   const [description, setDescription] = useState('');
+  const [dates, setDates] = useState({});
 
-  const [currentDate, setDate] = useState(new Date());
   useEffect(() => {
     async function fetchResponseData() {
       data = await getResponse('ZnyhJAgy6cFm5mfMj9GZ');
@@ -22,11 +22,6 @@ function ResponseScreen() {
   }, []);
   useEffect(() => {
     let counter = {};
-    let dates = {
-      '2020-06-01': { marked: true },
-      '2020-05-18': { selected: true, marked: true, selectedColor: 'blue' },
-      '2020-05-19': { disabled: true, disableTouchEvent: true },
-    };
     for (let [key, value] of Object.entries(responses)) {
       // console.log('k', key);
       for (let i = 0; i < value.length; i++) {
@@ -53,26 +48,29 @@ function ResponseScreen() {
       // }
     }
     let available = '';
+    console.log('khk', counter);
     for (let key in counter) {
-      if (counter[key] === 3) {
+      if (counter[key] == 3) {
         available = key;
+        console.log('available', available);
       }
     }
-    console.log('hey', available);
-    dates[available] = { selected: true, marked: true, selectedColor: 'green' },
+    let check = {
+      '2020-06-01': { marked: true },
+      '2020-05-18': { selected: true, marked: true, selectedColor: 'blue' },
+      '2020-05-19': { disabled: true, disableTouchEvent: true },
+    };
+    check[available] = { marked: true, dotColor: 'green', activeOpacity: 0 };
+    setDates(check);
+    console.log('dsfcjsdfsf', available);
+    console.log('hshs', dates);
   }, []);
   let test = moment.unix(1591088400).format('YYYY-MM-DD HH:mm:ss');
-
-  // dates[marked] = { marked: true, dotColor: 'green', activeOpacity: 0 };
-  // dates[first] = { marked: true, dotColor: 'red', activeOpacity: 0 };
   return (
     <View>
       <Text>Name: {eventName}</Text>
       <Text>Description: {description}</Text>
-      <CalendarList
-        current={currentDate}
-        markedDates={dates}
-        />
+      <CalendarList markedDates={dates} />
     </View>
   );
   // }
