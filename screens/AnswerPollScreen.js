@@ -6,7 +6,10 @@ import {
   StyleSheet,
   PanResponder,
   Animated,
+  TouchableOpacity,
 } from "react-native";
+
+import { selectionAsync } from "expo-haptics";
 
 const TIMEBOX_HEIGHT = 60;
 const CALENDAR_MARGIN_TOP = 8;
@@ -21,6 +24,7 @@ export default class App extends React.Component {
       adding: false,
     };
     this.isOccupied = this.isOccupied.bind(this);
+    this.removeAvailability = this.removeAvailability.bind(this);
   }
 
   scrollOffset = 0;
@@ -30,10 +34,10 @@ export default class App extends React.Component {
 
   panResponder = PanResponder.create({
     // Ask to be the responder:
-    onStartShouldSetPanResponder: () => true,
-    onStartShouldSetPanResponderCapture: () => true,
-    onMoveShouldSetPanResponder: () => true,
-    onMoveShouldSetPanResponderCapture: () => true,
+    onStartShouldSetPanResponder: (evt) => true,
+    onStartShouldSetPanResponderCapture: (evt) => false, // Children respond first
+    onMoveShouldSetPanResponder: (evt) => true,
+    onMoveShouldSetPanResponderCapture: (evt) => true,
 
     onPanResponderGrant: async (_evt, gestureState) => {
       let headerHeight = this.state.startY;
@@ -50,20 +54,23 @@ export default class App extends React.Component {
         });
       }
       const top = gestureState.y0 + this.scrollOffset - headerHeight;
-      if (!this.isOccupied(top)) {
-        const topWithSnapping = top - (top % TIMEBOX_HEIGHT);
-        const stateChange = {
-          top: topWithSnapping + CALENDAR_MARGIN_TOP,
-          adding: true,
-        };
-        this.setState(
-          !this.state.startY
-            ? { ...stateChange, startY: headerHeight }
-            : stateChange
-        );
-        this.gestureOffset = top % TIMEBOX_HEIGHT;
-        this.height.setValue(TIMEBOX_HEIGHT);
-        this.blocks = 1;
+      if (!this.isOccupied(top, 0)) {
+        this.longpressTimeout = setTimeout(() => {
+          selectionAsync();
+          const topWithSnapping = top - (top % TIMEBOX_HEIGHT);
+          const stateChange = {
+            top: topWithSnapping + CALENDAR_MARGIN_TOP,
+            adding: true,
+          };
+          this.setState(
+            !this.state.startY
+              ? { ...stateChange, startY: headerHeight }
+              : stateChange
+          );
+          this.gestureOffset = top % TIMEBOX_HEIGHT;
+          this.height.setValue(TIMEBOX_HEIGHT);
+          this.blocks = 1;
+        }, 500);
       }
     },
 
@@ -73,10 +80,12 @@ export default class App extends React.Component {
         if (
           (height < (this.blocks - 1) * TIMEBOX_HEIGHT ||
             height > this.blocks * TIMEBOX_HEIGHT) &&
-          !this.isOccupied(this.state.top + height)
+          !this.isOccupied(this.state.top, height)
         ) {
           const heightWithSnapping =
-            TIMEBOX_HEIGHT + height - (height % TIMEBOX_HEIGHT);
+            height > 0
+              ? TIMEBOX_HEIGHT + height - (height % TIMEBOX_HEIGHT)
+              : 0;
           this.blocks = heightWithSnapping / TIMEBOX_HEIGHT;
           Animated.timing(this.height, {
             toValue: heightWithSnapping,
@@ -90,9 +99,10 @@ export default class App extends React.Component {
     onPanResponderRelease: (evt, gestureState) => {
       // The user has released all touches while this view is the
       // responder. This typically means a gesture has succeeded
+      clearTimeout(this.longpressTimeout);
       if (this.state.adding) {
         this.setState((state) => {
-          return this.height._value > 0
+          return this.height._value - this.gestureOffset > 0
             ? {
                 availabilityList: [
                   ...state.availabilityList,
@@ -109,21 +119,34 @@ export default class App extends React.Component {
     onPanResponderTerminate: (evt, gestureState) => {
       // Another component has become the responder, so this gesture
       // should be cancelled
+      clearTimeout(this.longpressTimeout);
       this.setState({ adding: false });
     },
     onShouldBlockNativeResponder: (evt, gestureState) => {
       // Returns whether this component should block native components from becoming the JS
       // responder. Returns true by default. Is currently only supported on android.
-      return true;
+      return false;
     },
   });
 
-  isOccupied(y) {
-    const test = this.state.availabilityList.reduce((acc, item) => {
+  isOccupied(y, h) {
+    return this.state.availabilityList.reduce((acc, item) => {
       const { startY, height } = item;
-      return acc || (startY <= y && y <= startY + height);
+      return (
+        acc ||
+        (startY <= y + h && y + h <= startY + height) || // Current drag pos is inside existing block
+        (y <= startY && startY + height <= y + h) // Current block contains existing block
+      );
     }, false);
-    return test;
+  }
+
+  removeAvailability(startY) {
+    selectionAsync();
+    this.setState({
+      availabilityList: this.state.availabilityList.filter(
+        (el) => el.startY !== startY
+      ),
+    });
   }
 
   render() {
@@ -170,9 +193,12 @@ export default class App extends React.Component {
           )}
           {availabilityList.map(({ startY, height }) => (
             <View style={styles.overlay} key={startY}>
-              <Animated.View
-                style={[styles.selectionBox, { height, marginTop: startY }]}
-              />
+              <Animated.View style={{ height, marginTop: startY }}>
+                <TouchableOpacity
+                  onLongPress={() => this.removeAvailability(startY)}
+                  style={[styles.selectionBox, { height }]}
+                />
+              </Animated.View>
             </View>
           ))}
         </ScrollView>
