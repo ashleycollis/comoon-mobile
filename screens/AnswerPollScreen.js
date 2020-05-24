@@ -32,7 +32,7 @@ export default class App extends React.Component {
   blocks = 1;
   height = new Animated.Value(0);
 
-  panResponder = PanResponder.create({
+  mainPanResponder = PanResponder.create({
     // Ask to be the responder:
     onStartShouldSetPanResponder: (evt) => true,
     onStartShouldSetPanResponderCapture: (evt) => false, // Children respond first
@@ -40,6 +40,7 @@ export default class App extends React.Component {
     onMoveShouldSetPanResponderCapture: (evt) => true,
 
     onPanResponderGrant: async (_evt, gestureState) => {
+      console.log("mainpan respond");
       let headerHeight = this.state.startY;
 
       // The gesture has started
@@ -55,7 +56,9 @@ export default class App extends React.Component {
       }
       const top = gestureState.y0 + this.scrollOffset - headerHeight;
       if (!this.isOccupied(top, 0)) {
+        console.log("starting timeout");
         this.longpressTimeout = setTimeout(() => {
+          console.log("start gesture");
           selectionAsync();
           const topWithSnapping = top - (top % TIMEBOX_HEIGHT);
           const stateChange = {
@@ -92,6 +95,8 @@ export default class App extends React.Component {
             duration: 10,
           }).start();
         }
+      } else {
+        console.log("KAPUT");
       }
     },
 
@@ -99,6 +104,7 @@ export default class App extends React.Component {
     onPanResponderRelease: (evt, gestureState) => {
       // The user has released all touches while this view is the
       // responder. This typically means a gesture has succeeded
+      console.log("timeout cleared: success");
       clearTimeout(this.longpressTimeout);
       if (this.state.adding) {
         this.setState((state) => {
@@ -119,6 +125,8 @@ export default class App extends React.Component {
     onPanResponderTerminate: (evt, gestureState) => {
       // Another component has become the responder, so this gesture
       // should be cancelled
+      console.log("timeout cleared: cancel");
+
       clearTimeout(this.longpressTimeout);
       this.setState({ adding: false });
     },
@@ -127,6 +135,10 @@ export default class App extends React.Component {
       // responder. Returns true by default. Is currently only supported on android.
       return false;
     },
+  });
+
+  backgroundPanResponder = PanResponder.create({
+    onStartShouldSetPanResponder: (e, g) => false,
   });
 
   isOccupied(y, h) {
@@ -156,7 +168,7 @@ export default class App extends React.Component {
         ref={(ref) => (this.viewRef = ref)}
         style={styles.container}
         collapsable={false}
-        {...this.panResponder.panHandlers}
+        {...this.mainPanResponder.panHandlers}
       >
         <ScrollView
           onScroll={({ nativeEvent }) =>
