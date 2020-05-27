@@ -32,7 +32,14 @@ export default StyleSheet.create({
     numDateOptions: {
         flex: 1,
     },
-    dateOptionsText: {
+    sectionTitle: {
+        marginLeft: 18,
+        alignSelf: 'flex-start',
+        fontSize: 18,
+        color: '#fff',
+        marginTop: 10,
+    },
+    numOfSelectedOptions: {
         width: deviceWidth - 40,
         borderColor: '#fff',
         borderBottomWidth: 1,
@@ -40,37 +47,41 @@ export default StyleSheet.create({
         color: '#fff',
         fontSize: 20,
         marginLeft: 60,
-        padding: 4,
+        padding: 10,
     },
     dateOptionsDisplay: {
-        flex: 3,
+        flex: 1,
         flexDirection: 'row',
+        alignContent: 'flex-start',
+        marginTop: -50
     },
-    selectedHours: {
-        flex: 3,
+    TimeSection: {
+        flex: 1,
         justifyContent: 'flex-start',
+        alignItems: 'flex-start',
+    },
+    LocationSection: {
+        flex: 2,
+        justifyContent: 'flex-start',
+        alignItems: 'flex-start'
+    },
+    touchableOpacityStyle:{
+        position: 'absolute',
+        width: 75,
+        height: 75,
         alignItems: 'center',
-        marginTop: -40
-    },
-    sectionTitle: {
-        marginLeft: 18,
-        alignSelf: 'flex-start',
-        fontSize: 18,
-        color: '#fff'
-    },
-    location: {
-        width: deviceWidth - 40,
-        borderColor: '#fff',
-        borderBottomWidth: 1,
-        borderRadius: 6,
-        marginLeft: 60,
-        fontSize: 20,
-    },
-    locationText: {
-        fontSize: 18,
-        color: 'rgba(0,0,0,0.4)',
-        marginLeft: 3,
-        marginTop: 10,
-        marginBottom: 10,
-    }
+        justifyContent: 'center',
+        right: 30,
+        bottom: 30,
+      },
+      floatingButtonStyle: {
+        resizeMode: 'contain',
+        width: 75,
+        height: 55,
+        margin: 40,
+      },
+      botttomLogo:{
+        alignContent: 'center',
+        alignItems: 'center',
+      }
 });
