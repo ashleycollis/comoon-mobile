@@ -52,17 +52,18 @@ const CreatePoll = ({ navigation }) => {
                 <Text style={styles.sectionTitle}>Time:</Text>
                 <View style={styles.location}>
                     <Text
-                        style={styles.locationText}
-                        onPress={() => navigation.navigate('TimeScreen', {
+                        onPress={() => navigation.navigate('TimeGrid', {
                             selectedDates
                         })}
                     >
-                        Location
                     </Text>
                 </View>
+   
             </View>
+            
         </View>
     )
 };
 
 export default CreatePoll;
+

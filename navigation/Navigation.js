@@ -4,6 +4,10 @@ import BottomTabNavigator from "./BottomTabNavigator";
 import LandingScreen from "../screens/LandingScreen";
 import VerificationScreen from "../screens/VerificationScreen";
 import SignUpScreen from "../screens/SignUpScreen";
+import CalendarScreen from "../screens/CalenderScreen"
+import TimeScreen from "../screens/TimeScreen"
+import TimeGrid from "../screens/TimeGrid"
+import CreatePoll from "../screens/CreatePoll";
 import { connect } from "react-redux";
 import { createStackNavigator } from "@react-navigation/stack";
 
@@ -20,8 +24,15 @@ function Navigation({ containerRef, initialNavigationState, loggedIn }) {
       initialState={initialNavigationState}
     >
       <Stack.Navigator>
-        {loggedIn ? (
-          <Stack.Screen name="Root" component={BottomTabNavigator} />
+        {true ? (
+          <>
+            <Stack.Screen name="Root" component={BottomTabNavigator} />
+            <Stack.Screen name="Calendar" component={CalendarScreen}/>
+            <Stack.Screen name="TimeScreen" component={TimeScreen}/>
+            <Stack.Screen name="TimeGrid" component={TimeGrid}/>
+            <Stack.Screen name="CreatePoll" component={CreatePoll}/>
+
+          </>
         ) : (
           <>
             <Stack.Screen name="Landing" component={LandingScreen} />

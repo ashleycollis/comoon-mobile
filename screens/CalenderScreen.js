@@ -16,10 +16,13 @@ export default class CalendarScreen extends Component {
             Add Time
           </Text>
         </View>
-        <CalendarList
+        <Calendar
           pastScrollRange={24}
           futureScrollRange={24}
           onDayPress={(day) => {console.log(day)}}
+          markedDates={{
+          
+          }}
         />
       </View>
     );
