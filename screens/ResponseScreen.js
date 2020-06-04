@@ -5,6 +5,16 @@ import { getResponse } from '../api/pollRoutes';
 import { Calendar, CalendarList, Agenda } from 'react-native-calendars';
 const moment = require('moment');
 
+function intersection(setA, setB) {
+  let _intersection = new Set();
+  for (let elem of setB) {
+    if (setA.has(elem)) {
+      _intersection.add(elem);
+    }
+  }
+  return _intersection;
+}
+
 function ResponseScreen() {
   const [responses, setResponses] = useState('');
   const [eventName, setName] = useState('');
@@ -22,25 +32,34 @@ function ResponseScreen() {
   }, []);
   useEffect(() => {
     let counter = {}; //keeps track of number of people who can meet at that date
-    console.log('uh:', responses);
+    // console.log('responses', responses);
+    let justResponses = {};
     for (let [key, value] of Object.entries(responses)) {
+      if (!justResponses[key]) {
+        justResponses[key] = new Set();
+      }
+      console.log('key');
       for (let i = 0; i < value.length; i++) {
-        console.log(value);
-        let date = moment.unix(value[i].endTime).format('YYYY-MM-DD');
-        console.log(date);
-        if (counter[date]) {
-          counter[date]++;
-        } else {
-          counter[date] = 1;
+        let start = value[i].startTime.seconds;
+        let end = value[i].endTime.seconds;
+        let current = start;
+        while (current < end) {
+          justResponses[key].add(current);
+          current += 15 * 60;
         }
+        console.log(justResponses);
       }
     }
+    let availableSlotsByEverybody = Object.values(justResponses)[0];
+    for (let value in Object.values(justResponses)) {
+      console.log(availableSlotsByEverybody, value);
+      availableSlotsByEverybody = intersection(
+        availableSlotsByEverybody,
+        value
+      );
+    }
+    console.log(availableSlotsByEverybody);
     let available = '';
-    for (let key in counter) {
-      if (counter[key] == 3) {
-        available = key;
-      }
-    }
     let check = {
       '2020-05-19': { disabled: true, disableTouchEvent: true },
     }; //the marked sample dates object, but we're only concerned with date added recently
